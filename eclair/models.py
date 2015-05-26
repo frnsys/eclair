@@ -53,3 +53,13 @@ class Email():
 
         # Get replies only, not the quotes
         self.body = quotations.extract_from(self.body, 'text/plain')
+
+    def to_json(self):
+        return {
+            'recipients': [r.address for r in self.recipients],
+            'sender': self.sender.address,
+            'subject': self.subject,
+            'date': self.date,
+            'body': self.body,
+            'signature': self.signature
+        }

@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<header class="primary-header">
+    <h1>Eclair</h1>
+    <div class="controls">
+        <input type="number" value="{{ clusters|length }}" name="n_clusters"> n clusters
+        <button type="submit">Re-run</button>
+    </div>
+</header>
+<div class="overlay">
+    <div class="overlay--content">
+    </div>
+</div>
+<div class="content">
+    {% for cluster in clusters %}
+        <div class="cluster">
+            <h6>{{ cluster|length }} docs</h6>
+            <div class="cluster--docs">
+                {% for doc in cluster %}
+                    <div class="cluster--doc">
+                        <ul class="meta">
+                            <li><span class="meta-title">From:</span> {{ doc.sender.address }}</li>
+                            <li><span class="meta-title">To:</span> {{doc.recipients|join(', ', attribute='address')}}</li>
+                            <li><span class="meta-title">Subject:</span> {{ doc.subject }}</li>
+                        </ul>
+                        <div class="cluster--doc--body">{{ doc.highlighted_body|safe }}</div>
+                        {% if doc.signature is not none %}
+                            <div class="cluster--doc--signature">{{ doc.signature }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <h6><a href="#" class="show-all">Show All</a></h6>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+    $(function() {
+        $('.show-all').on('click', function(e) {
+            var content = $(this).closest('.cluster').find('.cluster--docs');
+
+            e.preventDefault();
+            $('.overlay').show();
+            $('.overlay--content').empty().html(content.html());
+            return false;
+        });
+        $('.overlay').on('click', function(e) {
+            if (e.target.className == 'overlay') {
+                $('.overlay').hide();
+            }
+        });
+
+        $('.controls button').on('click', function() {
+            window.location = window.location.pathname + '?n_clusters=' + $('input[name=n_clusters]').val();
+        });
+    });
+</script>
+{% endblock %}

@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 import re
 from itertools import product
 from collections import Counter, defaultdict
+from nytnlp.tokenize.keyword import keyword_tokenizes
+from nytnlp.markup import markup_terms
 
 
 def guess_signatures(emails):
@@ -30,9 +32,11 @@ def guess_signatures(emails):
             i = -1
             e1b = e1.body.strip()
             e2b = e2.body.strip()
+            le1b = len(e1b)
+            le2b = len(e2b)
             while True:
-                if abs(i) > len(e1b) or \
-                    abs(i) > len(e2b) or \
+                if abs(i) > le1b or \
+                    abs(i) > le2b or \
                     e1b[i] != e2b[i]:
                     break
                 overlap.append(e1b[i])
@@ -56,3 +60,13 @@ def guess_signatures(emails):
             for em in ems:
                 em.signature = sig if em.signature is None else '\n'.join([sig, em.signature])
                 em.body = r.sub('', em.body).strip()
+
+
+def guess_keywords(emails):
+    docs = [e.body for e in emails]
+    t_docs = keyword_tokenizes(docs)
+    for i, t_doc in enumerate(t_docs):
+        emails[i].keywords = t_doc
+
+    for i, highlighted in enumerate(markup_terms(docs, t_docs)):
+        emails[i].highlighted_body = highlighted

@@ -4,5 +4,6 @@
 *.swo
 *.sql
 *.csv
+*.lprof
 config.py
 debug

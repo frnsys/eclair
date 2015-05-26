@@ -17,12 +17,16 @@ for file in files:
     except DecodingError:
         continue
 
-from eclair.network import build_network
-build_network(emails)
-
-foo
+#from eclair.network import build_network
+#build_network(emails)
 
 guess_signatures(emails)
+
+from eclair.cluster import cluster
+
+cluster(emails)
+
+foo
 
 import numpy as np
 from eclair.text import clean_doc, Vectorizer

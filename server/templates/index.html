@@ -108,6 +108,9 @@
                     .each(function(d) { d.source = d[0], d.target = d[d.length - 1]; })
                     .attr('class', 'link')
                     .attr('d', line)
+
+                    // Stroke width correlates with edge weight
+                    // TO DO how to deal w/ overlapping edges?
                     .attr('stroke-width', function(d) {
                         for (var i = 0; i < links.length; i++) {
                             var l = links[i];
@@ -116,8 +119,6 @@
                             }
                         }
                     });
-
-            console.log(links);
 
             node = node
                     .data(nodes)
