@@ -2,122 +2,162 @@
 
 {% block content %}
 <style>
-     html, body {
-         overflow: hidden;
-     }
-    .node circle {
-      stroke: #fff;
-      stroke-width: 1.5px;
-    }
-    .link {
-    }
+.node {
+  font: 300 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  fill: #bbb;
+}
+
+.node:hover {
+  fill: #000;
+}
+
+.link {
+  stroke: steelblue;
+  stroke-opacity: .8;
+  fill: none;
+  pointer-events: none;
+}
+
+.node:hover,
+.node--source,
+.node--target {
+  font-weight: 700;
+}
+
+.from {
+  color: #F39F2B;
+}
+.to {
+  color: #d62728;
+}
+
+.node--source {
+  fill: #F39F2B;
+}
+
+.node--target {
+  fill: #d62728;
+}
+
+.link--source,
+.link--target {
+  stroke-opacity: 1;
+}
+
+.link--source {
+  stroke: #d62728;
+}
+
+.link--target {
+  stroke: #F39F2B;
+}
 </style>
 
 <header class="primary-header">
     <h1>Eclair</h1>
+    <div class="legend">
+        <span class="from">Sender</span>
+        <span class="to">Recipient</span>
+    </div>
 </header>
 {% endblock %}
 
 {% block script %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.js"></script>
 <script type="text/javascript">
     $(function() {
-        var width = window.innerWidth,
-        height = window.innerHeight;
+        var diameter = 960,
+            radius = diameter/2,
+            inner_radius = radius - 120;
 
-        var color = d3.scale.category20();
+        var cluster = d3.layout.cluster()
+            .size([360, inner_radius])
+            .sort(null)
+            .value(function(d) { return d.degree; });
 
-        var force = d3.layout.force()
-            .linkDistance(400)
-            .size([width, height]);
+        var bundle = d3.layout.bundle();
 
-        var zoom = d3.behavior.zoom()
-            .scaleExtent([1, 10])
-            .on('zoom', zoomed);
-
-        var drag = d3.behavior.drag()
-            .origin(function(d) { return d; })
-            .on('dragstart', dragstarted)
-            .on('drag', dragged)
-            .on('dragend', dragended);
+        var line = d3.svg.line.radial()
+                .interpolate('bundle')
+                .tension(.85)
+                .radius(function(d) { return d.y; })
+                .angle(function(d) { return d.x/180 * Math.PI; });
 
         var svg = d3.select('body').append('svg')
-            .attr('width', width)
-            .attr('height', height)
-            .append('g')
-            .call(zoom);
+                .attr('width', diameter)
+                .attr('height', diameter)
+                .append('g')
+                .attr('transform', 'translate(' + radius + ',' + radius + ')');
 
-        var container = svg.append('g').call(drag);
+        var link = svg.append('g').selectAll('.link'),
+            node = svg.append('g').selectAll('.node');
 
         d3.json('/graph.json', function(error, graph) {
-            var loading = svg.append("text")
-                .attr("x", width / 2)
-                .attr("y", height / 2)
-                .attr("dy", ".35em")
-                .style("text-anchor", "middle")
-                .text("Simulating. One moment please…");
+            var nodes = cluster.nodes({children: graph.nodes}),
+                links = graph.links;
 
-            force
-                .nodes(graph.nodes)
-                .links(graph.links)
+            // Map links' sources and targets to objs instead of idxs
+            links.forEach(function(d) {
+                d.source = graph.nodes[d.source];
+                d.target = graph.nodes[d.target];
+            });
 
-            setTimeout(function() {
-                var n = 100;
-                force.start();
-                for (var i = n * n; i > 0; --i) force.tick();
-                force.stop();
-                loading.remove();
+            link = link
+                    .data(bundle(links))
+                    .enter().append('path')
+                    .each(function(d) { d.source = d[0], d.target = d[d.length - 1]; })
+                    .attr('class', 'link')
+                    .attr('d', line)
+                    .attr('stroke-width', function(d) {
+                        for (var i = 0; i < links.length; i++) {
+                            var l = links[i];
+                            if (l.source == d[0] && l.target == d[d.length - 1]) {
+                                return Math.sqrt(l.weight);
+                            }
+                        }
+                    });
 
-                var link = container.selectAll('.link')
-                    .data(graph.links)
-                    .enter().append('line')
-                    .attr('class', 'link');
+            console.log(links);
 
-                var node = container.selectAll('.node')
-                    .data(graph.nodes)
-                    .enter().append('g')
-                    .attr('class', 'node');
-                    //.call(force.drag)
-
-                node.append('circle')
-                    .attr('r', function(d) { return Math.sqrt(d.degree) * 5; })
-                    .style('fill', function(d) { return color(d.id); });
-
-                node.append('text')
-                    .attr('dx', 12)
-                    .attr('dy', '.35em')
-                    .attr('font-size', '10px')
-                    .attr('fill', '#222222')
-                    .text(function(d) { return d.id });
-
-                link.attr('x1', function(d) { return d.source.x; })
-                    .attr('y1', function(d) { return d.source.y; })
-                    .attr('x2', function(d) { return d.target.x; })
-                    .attr('y2', function(d) { return d.target.y; })
-                    .attr('stroke', function(d) { return color_for_percent(d.n_weight); });
-
-                node.attr('transform', function(d) {
-                    return 'translate(' + [d.x, d.y] + ')';
-                });
-            }, 10);
+            node = node
+                    .data(nodes)
+                    .enter().append('text')
+                    .attr('class', 'node')
+                    .attr('dy', '.31em')
+                    .attr('transform', function(d) { return 'rotate(' + (d.x - 90) + ')translate(' + (d.y + 8) + ',0)' + (d.x < 180 ? '' : 'rotate(180)'); })
+                    .style('text-anchor', function(d) { return d.x < 180 ? 'start' : 'end'; })
+                    .text(function(d) { return d.id; })
+                    .on('mouseover', mouseovered)
+                    .on('mouseout', mouseouted);
         });
 
-        function zoomed() {
-            container.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
+        function mouseovered(d) {
+            node
+                .each(function(n) { n.target = n.source = false; });
+
+            link
+                .classed('link--target', function(l) { if (l.target === d) return l.source.source = true; })
+                .classed('link--source', function(l) { if (l.source === d) return l.target.target = true; })
+                .filter(function(l) { return l.target === d || l.source === d; })
+                .each(function() { this.parentNode.appendChild(this); });
+
+            node
+                .classed('node--target', function(n) { return n.target; })
+                .classed('node--source', function(n) { return n.source; });
         }
 
-        function dragstarted(d) {
-            d3.event.sourceEvent.stopPropagation();
-            d3.select(this).classed('dragging', true);
+        function mouseouted(d) {
+            link
+                .classed('link--target', false)
+                .classed('link--source', false);
+
+            node
+                .classed('node--target', false)
+                .classed('node--source', false);
         }
 
-        function dragged(d) {
-            d3.select(this).attr('cx', d.x = d3.event.x).attr('cy', d.y = d3.event.y);
-        }
+        d3.select(self.frameElement).style('height', diameter + 'px');
 
-        function dragended(d) {
-            d3.select(this).classed('dragging', false);
-        }
    });
 </script>
 {% endblock %}

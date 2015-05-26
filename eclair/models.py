@@ -22,12 +22,13 @@ class Email():
         if to is None:
             self.recipients = []
         else:
+            to = to.lower()
             self.recipients = address.parse_list(to) if ',' in to else [address.parse(to)]
 
         # It's possible a recipient is None if it is something like
         # 'Undisclosed recipients:;'
         self.recipients = [r for r in self.recipients if r is not None]
-        self.sender = address.parse(self.raw.headers['From'])
+        self.sender = address.parse(self.raw.headers['From'].lower())
 
         self.subject = self.raw.subject
         self.id = self.raw.message_id

@@ -8,6 +8,10 @@ app = Flask(__name__, static_folder='static', static_url_path='')
 def index():
     return render_template('index.html')
 
+@app.route('/force')
+def force():
+    return render_template('force.html')
+
 
 # cheating a bit for now
 from glob import glob
@@ -19,7 +23,7 @@ from networkx.readwrite import json_graph
 files = glob('data/rubio_emails/*.eml')
 
 emails = []
-for file in files[:500]:
+for file in files:
     with open(file, 'r') as f:
         data = f.read()
 
@@ -29,7 +33,8 @@ for file in files[:500]:
     # Malformed email
     except DecodingError:
         continue
-G = build_network(emails)
+
+G = build_network(emails, min_degree=2)
 
 @app.route('/graph.json')
 def graph():

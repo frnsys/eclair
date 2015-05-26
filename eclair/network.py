@@ -2,7 +2,7 @@ import networkx as nx
 from collections import defaultdict
 
 
-def build_network(emails):
+def build_network(emails, min_degree=2):
     G = nx.DiGraph()
     senders = {e.sender.address for e in emails}
 
@@ -24,7 +24,12 @@ def build_network(emails):
     G.add_nodes_from(senders)
     G.add_edges_from(edges)
 
+    # Filter to nodes with degree of at least `min_degree`
     for node in G.nodes():
-        G.node[node]['degree'] = G.degree(node)
+        deg = G.degree(node)
+        if deg < min_degree:
+            G.remove_node(node)
+        else:
+            G.node[node]['degree'] = deg
 
     return G
