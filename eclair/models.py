@@ -23,6 +23,10 @@ class Email():
             self.recipients = []
         else:
             self.recipients = address.parse_list(to) if ',' in to else [address.parse(to)]
+
+        # It's possible a recipient is None if it is something like
+        # 'Undisclosed recipients:;'
+        self.recipients = [r for r in self.recipients if r is not None]
         self.sender = address.parse(self.raw.headers['From'])
 
         self.subject = self.raw.subject

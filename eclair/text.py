@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
 """
 For manipulating text.
 """
 
 import string
-from html.parser import HTMLParser
 
 from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer, HashingVectorizer
 from sklearn.decomposition import TruncatedSVD
@@ -97,29 +100,6 @@ class Tokenizer():
         return tokens
 
 
-class MLStripper(HTMLParser):
-    def __init__(self):
-        super().__init__()
-        self.reset()
-        self.strict = False
-        self.convert_charrefs= True
-        self.fed = []
-    def handle_data(self, d):
-        self.fed.append(d)
-    def get_data(self):
-        return ' '.join(self.fed)
-
-
-def strip_tags(html):
-    # Any unwrapped text is ignored,
-    # so wrap html tags just in case.
-    # Looking for a more reliable way of stripping HTML...
-    html = '<div>{0}</div>'.format(html)
-    s = MLStripper()
-    s.feed(html)
-    return s.get_data()
-
-
 # Don't replace dashes, but do replace em-dashes with a space.
 dash_map = {ord(p): ' ' for p in '—'}
 punct_map = {ord(p): '' for p in (string.punctuation + '“”').replace('-', '')}
@@ -147,7 +127,6 @@ def html_decode(s):
 
 
 
-from gensim.models import Phrases
 from nytnlp.keywords import rake
 from textblob import Blobber
 from textblob_aptagger import PerceptronTagger

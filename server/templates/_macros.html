@@ -1,0 +1,24 @@
+{% macro numerical_stat(name, value) -%}
+    <div class="stat numerical">
+        <h5>{{ name }}</h5>
+        {% if value|int == value %}
+            <div class="value">{{ '{0:,}'.format(value) }}</div>
+        {% else %}
+            <div class="value">{{ '{0:,.2f}'.format(value) }}</div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro comment(comment) -%}
+    <div class="comment">
+        <h6 class="comment--user"><a href="/user/{{ comment.userID }}">{{ comment.userDisplayName }}</a></h6>
+        <div class="comment--body">{{ comment.commentBody|safe }}</div>
+        <ul class="comment--meta">
+            <li>{{ comment.recommendationCount }} recommendations</li>
+            <li>{{ comment.replyCount }} replies</li>
+            <li>posted in <a href="/asset/{{ comment.assetURL }}">{{ comment.assetURL }}</a></li>
+        </ul>
+    </div>
+{% endmacro %}
+
+

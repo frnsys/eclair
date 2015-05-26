@@ -1,0 +1,166 @@
+html, body {
+    color: #222;
+    font-family: "nyt-franklin",arial,helvetica,sans-serif;
+    padding: 0;
+    margin: 0;
+}
+.primary-header {
+    background: #F6F6F6;
+    overflow: hidden;
+    border-bottom: 1px solid #E5E5E5;
+}
+.primary-header select {
+    margin: 1.75em 0;
+}
+h1 {
+    font-family: "nyt-stymie";
+    font-weight: 700;
+    font-size: 1.5em;
+}
+h5 {
+    font-family: "nyt-stymie";
+    font-weight: 700;
+}
+header h1 {
+    margin: 0.5em 1em;
+    float: left;
+}
+a, a:visited {
+    color: #31708F;
+}
+
+.url {
+    width: 80%;
+    float: right;
+    background: none repeat scroll 0% 0% rgb(238, 238, 238);
+    height: 2em;
+    font-size: 1.2em;
+    border: none;
+    border-left: 1px solid #E5E5E5;
+    padding: 0.5em 1em;
+    font-family: "nyt-franklin",arial,helvetica,sans-serif;
+}
+.error {
+    color: #FC0D1B !important;
+}
+.success {
+    color: #4FC3A0;
+}
+.loading {
+    color: #aaa;
+}
+
+.hide {
+    display: none;
+}
+button {
+    padding: 0.1em 0.5em 0.2em 0.5em;
+    border-radius: 0.4em;
+    background: #fff;
+    border: 1px solid #dadada;
+    cursor: pointer;
+}
+
+
+/* Loader by Tobias Ahlin */
+/* https://github.com/tobiasahlin/SpinKit/blob/master/examples/5-pulse.html */
+.loader {
+  width: 24px;
+  height: 24px;
+  margin: 0 auto;
+  background-color: #333;
+  border-radius: 100%;
+  -webkit-animation: sk-pulseScaleOut 1s infinite ease-in-out;
+          animation: sk-pulseScaleOut 1s infinite ease-in-out; }
+
+@-webkit-keyframes sk-pulseScaleOut {
+  0% {
+    -webkit-transform: scale(0);
+            transform: scale(0); }
+
+  100% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+    opacity: 0; } }
+
+@keyframes sk-pulseScaleOut {
+  0% {
+    -webkit-transform: scale(0);
+            transform: scale(0); }
+
+  100% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+    opacity: 0; } }
+
+
+
+@-webkit-keyframes sk-pulseColor {
+  0% { color: #aaa; }
+  50% { color: #888; }
+  100% { color: #aaa; }
+}
+
+@keyframes sk-pulseColor {
+  0% { color: #aaa; }
+  50% { color: #888; }
+  100% { color: #aaa; }
+}
+
+.stats > li,
+.highlights > li {
+    margin: 2em 1em 0 1em;
+}
+.stat,
+.highlights .comment {
+    background: #fafafa;
+    border: 1px solid #dadada;
+    padding: 1em;
+    display: inline-block;
+}
+.stat {
+    text-align: center;
+    font-size: 1.2em;
+}
+.stat h5 {
+    margin: 0 0 1em;
+    color: #aaa;
+}
+.stat .value {
+    font-weight: 700;
+    font-size: 2em;
+    color: #43A2FF;
+}
+
+
+
+ul, li {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.list__horizontal > li {
+    vertical-align: top;
+    display: inline-block;
+    text-align: left;
+}
+
+.list__horizontal__center {
+    text-align: center;
+}
+
+.highlights {
+    margin: 4em 0;
+}
+.highlights .comment {
+    max-width: 320px;
+}
+.comment--user {
+    margin: 0 0 1em 0;
+}
+.comment--meta {
+    margin: 1em 0 0 0;
+    color: #aaa;
+    font-size: 0.8em;
+}
